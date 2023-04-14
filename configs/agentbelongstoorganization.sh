@@ -9,8 +9,11 @@ embedding_size=50
 batch_size=128
 beta=0.05
 Lambda=0.05
+# 需要使用实体嵌入？
 use_entity_embeddings=1
+# 需要进行实体嵌入
 train_entity_embeddings=1
+# 需要进行关系嵌入
 train_relation_embeddings=1
 base_output_dir="output/agentbelongstoorganization/"
 load_model=0

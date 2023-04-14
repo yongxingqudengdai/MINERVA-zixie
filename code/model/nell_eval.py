@@ -1,3 +1,15 @@
+# nell_eval.py 04/14
+# nell_eval.py是一个Python脚本，主要用于对NELL数据集进行评估。NELL（Never-Ending Language Learning）是一个由卡内基梅隆大学
+# （Carnegie Mellon University）开发的知识图谱构建系统，旨在从网络上的非结构化文本中自动提取出结构化的知识。nell_eval.py脚本
+# 包含了对NELL数据集的评估过程，它可以计算模型在NELL数据集上的精度、召回率和F1值等指标，以评估模型的性能。
+
+# 具体来说，nell_eval.py脚本实现了以下几个主要功能：
+
+# 加载NELL数据集，包括实体、关系和三元组等信息。
+# 加载已经训练好的模型，使用模型对NELL数据集进行预测，得到预测的三元组列表。
+# 将预测的三元组列表与真实的三元组列表进行比较，计算精度、召回率和F1值等评价指标。
+# 输出评价指标的结果。
+# nell_eval.py脚本主要用于评估知识图谱构建任务中的模型性能，可以帮助研究人员和开发者了解模型的优缺点，并进行模型的调整和优化。
 from __future__ import division
 import csv
 from collections import defaultdict

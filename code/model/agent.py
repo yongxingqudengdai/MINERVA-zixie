@@ -1,21 +1,35 @@
+# agent.py 164行 04/14
 import numpy as np
 import tensorflow as tf
 
-
+# 定义智能体agent类
 class Agent(object):
-
+    # 1.初始化函数 
+    # self：agent类的实例化对象。 params：超参数及其他配置
     def __init__(self, params):
 
+        # 动作词汇表大小
         self.action_vocab_size = len(params['relation_vocab'])
+        # 实体词汇表大小
         self.entity_vocab_size = len(params['entity_vocab'])
+        # 嵌入向量维度
         self.embedding_size = params['embedding_size']
+        # 隐藏层大小
         self.hidden_size = params['hidden_size']
+
+        # ???定义了两个常量张量ePAD和rPAD，用于在模型训练过程中填充数据
         self.ePAD = tf.constant(params['entity_vocab']['PAD'], dtype=tf.int32)
         self.rPAD = tf.constant(params['relation_vocab']['PAD'], dtype=tf.int32)
+
+        # 是否使用实体嵌入？
         if params['use_entity_embeddings']:
+            # ***使用Xavier进行权重初始化（旨在平衡方差）
             self.entity_initializer = tf.contrib.layers.xavier_initializer()
         else:
+            # ***使用zeros进行权重初始化（全部都是0）
             self.entity_initializer = tf.zeros_initializer()
+
+        # 根据配置项确定实体、关系是否要进行嵌入训练
         self.train_entities = params['train_entity_embeddings']
         self.train_relations = params['train_relation_embeddings']
 
