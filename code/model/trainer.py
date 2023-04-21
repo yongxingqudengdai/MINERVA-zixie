@@ -530,7 +530,7 @@ if __name__ == '__main__':
     logger.addHandler(logfile)
     # read the vocab files, it will be used by many classes hence global scope
     logger.info('reading vocab files...')
-    options['relation_vocab'] = json.load(open(options['vocab_dir'] + '/relation_vocab.json'))
+    options[''] = json.load(open(options['vocab_dir'] + '/relation_vocab.json'))
     options['entity_vocab'] = json.load(open(options['vocab_dir'] + '/entity_vocab.json'))
     logger.info('Reading mid to name map')
     mid_to_word = {}

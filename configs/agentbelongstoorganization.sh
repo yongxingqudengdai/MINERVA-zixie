@@ -5,6 +5,7 @@ vocab_dir="datasets/data_preprocessed/agentbelongstoorganization/vocab"
 total_iterations=500
 path_length=3
 hidden_size=50
+# 嵌入维度
 embedding_size=50
 batch_size=128
 beta=0.05

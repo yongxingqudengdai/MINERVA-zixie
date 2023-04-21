@@ -30,34 +30,52 @@ class Agent(object):
             self.entity_initializer = tf.zeros_initializer()
 
         # 根据配置项确定实体、关系是否要进行嵌入训练
+        # 实体：1
         self.train_entities = params['train_entity_embeddings']
+        # 关系：1
         self.train_relations = params['train_relation_embeddings']
 
+        # ***rollouts（滚动）
+        # num_rollouts:训练中每个样本使用的次数(20)
         self.num_rollouts = params['num_rollouts']
+        # test_rollouts:(100)
         self.test_rollouts = params['test_rollouts']
+
+        # LSTM层数:（1）
         self.LSTM_Layers = params['LSTM_layers']
+        # ***batch中样本被使用的总次数（128 * 20）
         self.batch_size = params['batch_size'] * params['num_rollouts']
+
+        # ???定义名为dummy_start_label的张量
         self.dummy_start_label = tf.constant(
             np.ones(self.batch_size, dtype='int64') * params['relation_vocab']['DUMMY_START_RELATION'])
 
+        # 嵌入维度（50）
         self.entity_embedding_size = self.embedding_size
         self.use_entity_embeddings = params['use_entity_embeddings']
+        # 如果使用实体嵌入，m取值为4 ； 否则为2
         if self.use_entity_embeddings:
             self.m = 4
         else:
             self.m = 2
 
+        # ***tensorflow作用域
+        # 关系嵌入相关
         with tf.variable_scope("action_lookup_table"):
+            # 占位，生成的是一个矩阵（动作词汇表大小*2倍嵌入维度）
             self.action_embedding_placeholder = tf.placeholder(tf.float32,
                                                                [self.action_vocab_size, 2 * self.embedding_size])
-
+            # 可训练，float32，Xavier初始化
             self.relation_lookup_table = tf.get_variable("relation_lookup_table",
                                                          shape=[self.action_vocab_size, 2 * self.embedding_size],
                                                          dtype=tf.float32,
                                                          initializer=tf.contrib.layers.xavier_initializer(),
                                                          trainable=self.train_relations)
+        
+            # 填充占位
             self.relation_embedding_init = self.relation_lookup_table.assign(self.action_embedding_placeholder)
 
+        # 实体
         with tf.variable_scope("entity_lookup_table"):
             self.entity_embedding_placeholder = tf.placeholder(tf.float32,
                                                                [self.entity_vocab_size, 2 * self.embedding_size])
@@ -68,10 +86,13 @@ class Agent(object):
                                                        trainable=self.train_entities)
             self.entity_embedding_init = self.entity_lookup_table.assign(self.entity_embedding_placeholder)
 
+        # 创建由多个LSTM组成的RNN，用于实现策略网络中的单个时间步骤
         with tf.variable_scope("policy_step"):
             cells = []
             for _ in range(self.LSTM_Layers):
+                # 对每个LSTM单元都有m*隐藏层个神经元 ； peephole 、 元组形式返回
                 cells.append(tf.contrib.rnn.LSTMCell(self.m * self.hidden_size, use_peepholes=True, state_is_tuple=True))
+            # 
             self.policy_step = tf.contrib.rnn.MultiRNNCell(cells, state_is_tuple=True)
 
     def get_mem_shape(self):
