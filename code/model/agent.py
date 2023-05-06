@@ -95,25 +95,34 @@ class Agent(object):
             # 
             self.policy_step = tf.contrib.rnn.MultiRNNCell(cells, state_is_tuple=True)
 
+    # 用于获取LSTM记忆状态的形状
     def get_mem_shape(self):
         return (self.LSTM_Layers, 2, None, self.m * self.hidden_size)
 
+    # 接收当前状态state作为输入，并返回对应的输出
     def policy_MLP(self, state):
         with tf.variable_scope("MLP_for_policy"):
+            # 创建一个全连接层，输入的神经元数量由state决定，输出神经元数量是4*self.hidden_size，激活函数是tf.nn.relu
             hidden = tf.layers.dense(state, 4 * self.hidden_size, activation=tf.nn.relu)
+            # 第二个全连接层具有m乘以嵌入维度个神经元，激活函数为ReLU。
             output = tf.layers.dense(hidden, self.m * self.embedding_size, activation=tf.nn.relu)
         return output
-
+    
+    # 将给定的下一个关系和实体编码为向量
     def action_encoder(self, next_relations, next_entities):
         with tf.variable_scope("lookup_table_edge_encoder"):
+            # 调用tf.nn.embedding_lookup函数将next_relations和next_entities分别查找对应的关系和实体向量（即嵌入）
             relation_embedding = tf.nn.embedding_lookup(self.relation_lookup_table, next_relations)
             entity_embedding = tf.nn.embedding_lookup(self.entity_lookup_table, next_entities)
+            # 如果使用实体嵌入，则将两个张量合并（按行横着合并）
             if self.use_entity_embeddings:
                 action_embedding = tf.concat([relation_embedding, entity_embedding], axis=-1)
             else:
+                # 只有关系嵌入
                 action_embedding = relation_embedding
         return action_embedding
 
+    # 模型前向传播过程
     def step(self, next_relations, next_entities, prev_state, prev_relation, query_embedding, current_entities,
              label_action, range_arr, first_step_of_test):
 
